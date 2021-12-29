@@ -1,6 +1,7 @@
 /*jshint esversion: 6 */
+/*jshint -W087 */
 let digit = 0;
-const exeption = "80/23-2*10*6/23-6/11*12";
+const exeption = "860+232+2530*13334*6/22-6/11*1243";
 let temp = 0;
 let result = 0;
 firstItteration = true;
@@ -8,6 +9,7 @@ firstItteration = true;
 const checkDigit = (exeptionElement, elementIndex) => {
   exeptionElement.forEach((element, index) => {
     //check first element
+
     while (index < 1) {
       if (
         exeptionElement[index] &&
@@ -22,19 +24,39 @@ const checkDigit = (exeptionElement, elementIndex) => {
       }
     }
     //check all next elements
+
     if (
-      exeptionElement[index + 1] &&
-      exeptionElement[index + 2] != "+" &&
-      exeptionElement[index + 1] &&
-      exeptionElement[index + 2] != "-" &&
-      exeptionElement[index + 1] &&
-      exeptionElement[index + 2] != "/" &&
-      exeptionElement[index + 1] &&
-      exeptionElement[index + 2] != "*" &&
-      exeptionElement[index + 1].match(/[0-9]/)
+      index < exeptionElement.length - 1 &&
+      exeptionElement[index] != "+" &&
+      exeptionElement[index] != "-" &&
+      exeptionElement[index] != "/" &&
+      exeptionElement[index] != "*"
+
+      //   exeptionElement[index + 1] &&
+      //   exeptionElement[index + 2] != "+" &&
+      //   exeptionElement[index + 1] &&
+      //   exeptionElement[index + 2] != "-" &&
+      //   exeptionElement[index + 1] &&
+      //   exeptionElement[index + 2] != "/" &&
+      //   exeptionElement[index + 1] &&
+      //   exeptionElement[index + 2] != "*" &&
+      //   exeptionElement[index + 1].match(/[0-9]/)
     ) {
-      exeptionElement[index + 1] += exeptionElement[index + 2];
-      exeptionElement.splice(index + 2, 1);
+      while (
+        index < exeptionElement.length - 1 &&
+        exeptionElement[index + 1] != "+" &&
+        exeptionElement[index + 1] != "-" &&
+        exeptionElement[index + 1] != "/" &&
+        exeptionElement[index + 1] != "*"
+      ) {
+        exeptionElement[index] += exeptionElement[index + 1];
+        //index++;
+        exeptionElement.splice(index + 1, 1);
+      }
+      //   exeptionElement[index + 1] += exeptionElement[index + 2];
+      //   exeptionElement.splice(index + 2, 1);
+    } else {
+      exeptionElement[index] = exeptionElement[index];
     }
   });
   console.log(exeptionElement);
