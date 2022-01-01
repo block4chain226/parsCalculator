@@ -1,71 +1,261 @@
-/*jshint esversion: 6 */
+//F that check operators in mass by index
 let digit = 0;
-const exeption = "80/23-2*10*6/23-6/11*12";
 let temp = 0;
 let result = 0;
+let itteration = 0;
 firstItteration = true;
-//check digits count
-const checkDigit = (exeptionElement, elementIndex) => {
+let exeption = "-810+232*44-22+(2-18)*(45+3)-44";
+let operatorsStack = [];
+/////////////////////////////////String to digits
+const checkDigit = (exeptionElement) => {
+  const specialChars = ["+", "-", "/", "*", "(", ")"];
   exeptionElement.forEach((element, index) => {
-    //check first element
-    while (index < 1) {
-      if (
-        exeptionElement[index] &&
-        exeptionElement[index + 1] != "+" &&
-        exeptionElement[index] &&
-        exeptionElement[index + 1] != "-" &&
-        exeptionElement[index + 1].match(/[0-9]/)
+    if (
+      index < exeptionElement.length - 1 &&
+      !specialChars.includes(exeptionElement[index])
+    ) {
+      while (
+        index < exeptionElement.length - 1 &&
+        !specialChars.includes(exeptionElement[index + 1])
       ) {
         exeptionElement[index] += exeptionElement[index + 1];
         exeptionElement.splice(index + 1, 1);
-        index++;
       }
-    }
-    //check all next elements
-    if (
-      exeptionElement[index + 1] &&
-      exeptionElement[index + 2] != "+" &&
-      exeptionElement[index + 1] &&
-      exeptionElement[index + 2] != "-" &&
-      exeptionElement[index + 1] &&
-      exeptionElement[index + 2] != "/" &&
-      exeptionElement[index + 1] &&
-      exeptionElement[index + 2] != "*" &&
-      exeptionElement[index + 1].match(/[0-9]/)
-    ) {
-      exeptionElement[index + 1] += exeptionElement[index + 2];
-      exeptionElement.splice(index + 2, 1);
+    } else {
+      exeptionElement[index] = exeptionElement[index];
     }
   });
+  digitalSign(exeptionElement);
   console.log(exeptionElement);
   return exeptionElement;
 };
-//checkDigit(exeption.split(""));
 
-const addition = (ex) => {
-  //   const exeptionElements = ex.split("");
-  const exeptionElements = checkDigit(exeption.split(""));
-  for (let i = 0; i <= exeptionElements.length; i++) {
-    if (ex[i] === "+" && firstItteration === true) {
-      temp = +exeptionElements[i - 1] + +exeptionElements[i + 1];
-      result += temp;
-      firstItteration = false;
-      i++;
+/////////////////////////////////negative digits
+const digitalSign = (exeptionElement) => {
+  exeptionElement.forEach((element, index) => {
+    if (
+      (exeptionElement[index] === "-" && index === 0) ||
+      (exeptionElement[index] === "-" && exeptionElement[index - 1] == "(")
+    ) {
+      exeptionElement[index] += exeptionElement[index + 1];
+      exeptionElement.splice(index + 1, 1);
     }
-    if (ex[i] === "+" && firstItteration == false) {
-      result += +exeptionElements[i + 1];
+  });
+};
+
+/////////////////////////////////Main calculations
+const calculations = (ex) => {
+  let exeptionElements = checkDigit(exeption.split(""));
+  let tempResult;
+
+  let a = "*",
+    b = "/";
+  ////test
+  let scopeFirst = 0;
+  while (exeptionElements.indexOf("(") !== -1) {
+    scopeFirst = exeptionElements.indexOf("(");
+    scopes(scopeFirst, exeptionElements);
+  }
+  // operatorsStack.push(exeptionElements.filter((el) => el == "*" || el == "/"));
+  // operatorsStack.push(exeptionElements.filter((el) => el == "+" || el == "-"));
+  // let operators = [].concat(...operatorsStack);
+  itteration++;
+
+  ////////
+
+  ///////////// * and /
+  for (let i = 1; i < exeptionElements.length; i++) {
+    operatorsStack.push(
+      exeptionElements.filter((el) => el == "*" || el == "/")
+    );
+    operatorsStack.push(
+      exeptionElements.filter((el) => el == "+" || el == "-")
+    );
+    let operators = [].concat(...operatorsStack);
+    itteration++;
+    if (
+      exeptionElements.indexOf("*", 1) !== -1 ||
+      exeptionElements.indexOf("/", 1) !== -1
+    ) {
+      switch (exeptionElements[i]) {
+        case "*":
+          itteration++;
+          multiply(
+            exeptionElements[i - 1],
+            i,
+            exeptionElements[i + 1],
+            exeptionElements
+          );
+          i = i - 1;
+          break;
+        case "/":
+          itteration++;
+          devision(
+            exeptionElements[i - 1],
+            i,
+            exeptionElements[i + 1],
+            exeptionElements
+          );
+          i = i - 1;
+          break;
+      }
+    } else {
+      break;
     }
   }
-  console.log(`temp= ${temp}\n result= ${result}`);
 
-  // exeptionElements.forEach((element, index) => {
-  //   if (exeptionElements[index].match(/[0-9]/)) {
-  //     exeptionElements[index] = +element;
-  //     result = +element;
-  //   }
-  //   // temp = exeptionElements[index].match(/[0-9]/);
-  //   // exeptionElements[index] = +temp[0];
-  // });
-  //console.log(exeption);
+  ///////////// + and -
+  for (let i = 1; i < exeptionElements.length; i++) {
+    itteration++;
+    switch (exeptionElements[i]) {
+      case "+":
+        itteration++;
+        addition(
+          exeptionElements[i - 1],
+          i,
+          exeptionElements[i + 1],
+          exeptionElements
+        );
+        i = i - 1;
+        break;
+      case "-":
+        itteration++;
+        substruct(
+          exeptionElements[i - 1],
+          i,
+          exeptionElements[i + 1],
+          exeptionElements
+        );
+        i = i - 1;
+        break;
+    }
+  }
 };
-addition(exeption);
+
+//////////////////////////////////////////////////Equations
+
+//////////////////////////////////Scopes
+const scopes = (scopeIndex, exeptionElements) => {
+  let scopeEnd = exeptionElements.indexOf(")");
+  let inScopeLength = scopeEnd - scopeIndex - 1;
+  //let scopeElements = exeptionElements.splice(scopeIndex + 1, inScopeLength);
+
+  // operatorsStack.push(scopeElements.filter((el) => el == "*" || el == "/"));
+  // operatorsStack.push(scopeElements.filter((el) => el == "+" || el == "-"));
+  // let operators = [].concat(...operatorsStack);
+  for (let i = scopeIndex + 1; i < scopeEnd; i++) {
+    switch (exeptionElements[i]) {
+      case "*":
+        itteration++;
+        multiply(
+          exeptionElements[i - 1],
+          i,
+          exeptionElements[i + 1],
+          exeptionElements
+        );
+        scopeEnd = exeptionElements.indexOf(")");
+        i = i - 1;
+        break;
+      case "/":
+        itteration++;
+        devision(
+          exeptionElements[i - 1],
+          i,
+          exeptionElements[i + 1],
+          exeptionElements
+        );
+        scopeEnd = exeptionElements.indexOf(")");
+        i = i - 1;
+        break;
+      default:
+    }
+    //exeptionElements[elementIndex - 1] = res;
+  }
+
+  ///// + -
+  for (let i = scopeIndex + 1; i < scopeEnd; i++) {
+    switch (exeptionElements[i]) {
+      case "+":
+        itteration++;
+        addition(
+          exeptionElements[i - 1],
+          i,
+          exeptionElements[i + 1],
+          exeptionElements
+        );
+        scopeEnd = exeptionElements.indexOf(")");
+        i = i - 1;
+        break;
+      case "-":
+        itteration++;
+        substruct(
+          exeptionElements[i - 1],
+          i,
+          exeptionElements[i + 1],
+          exeptionElements
+        );
+        scopeEnd = exeptionElements.indexOf(")");
+        i = i - 1;
+        break;
+      default:
+    }
+    //exeptionElements[elementIndex - 1] = res;
+  }
+  exeptionElements.splice(scopeIndex, 1);
+  exeptionElements.splice(scopeIndex + 1, 1);
+};
+-810;
+
+/////////////////////////////////Multiply
+const multiply = (
+  beforeElement,
+  elementIndex,
+  afterElement,
+  exeptionElements
+) => {
+  let res = beforeElement * afterElement;
+  exeptionElements[elementIndex - 1] = res;
+  exeptionElements.splice(elementIndex, 2);
+  console.log(exeptionElements);
+};
+
+/////////////////////////////////Addition
+const addition = (
+  beforeElement,
+  elementIndex,
+  afterElement,
+  exeptionElements
+) => {
+  let res = +beforeElement + +afterElement;
+  exeptionElements[elementIndex - 1] = res;
+  exeptionElements.splice(elementIndex, 2);
+  console.log(exeptionElements);
+};
+
+/////////////////////////////////Substruct
+const substruct = (
+  beforeElement,
+  elementIndex,
+  afterElement,
+  exeptionElements
+) => {
+  let res = +beforeElement - +afterElement;
+  exeptionElements[elementIndex - 1] = res;
+  exeptionElements.splice(elementIndex, 2);
+  console.log(exeptionElements);
+};
+
+/////////////////////////////////Devision
+const devision = (
+  beforeElement,
+  elementIndex,
+  afterElement,
+  exeptionElements
+) => {
+  let res = +beforeElement / +afterElement;
+  exeptionElements[elementIndex - 1] = res;
+  exeptionElements.splice(elementIndex, 2);
+  console.log(exeptionElements);
+};
+
+calculations(exeption);
