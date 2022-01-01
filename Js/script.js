@@ -130,9 +130,6 @@ const calculations = (ex) => {
         break;
     }
   }
-
-  console.log(result);
-  console.log(itteration);
 };
 
 //////////////////////////////////////////////////Equations
@@ -207,6 +204,7 @@ const scopes = (scopeIndex, exeptionElements) => {
   exeptionElements.splice(scopeIndex, 1);
   exeptionElements.splice(scopeIndex + 1, 1);
 };
+-810;
 
 /////////////////////////////////Multiply
 const multiply = (
