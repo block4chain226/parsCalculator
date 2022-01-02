@@ -4,7 +4,7 @@ let temp = 0;
 let result = 0;
 let itteration = 0;
 firstItteration = true;
-let exeption = "-810+232*44-22+(2-18)*(45+3)-44";
+let exeption = "-810+232*44-(22+(2-18*5)*(45+3)+(94*1-34+43)*4)-44";
 let operatorsStack = [];
 /////////////////////////////////String to digits
 const checkDigit = (exeptionElement) => {
@@ -26,7 +26,9 @@ const checkDigit = (exeptionElement) => {
     }
   });
   digitalSign(exeptionElement);
+  //console.log(closedScopesCountCheck(exeptionElement));
   console.log(exeptionElement);
+  //scopeStack(exeptionElement);
   return exeptionElement;
 };
 
@@ -136,14 +138,21 @@ const calculations = (ex) => {
 
 //////////////////////////////////Scopes
 const scopes = (scopeIndex, exeptionElements) => {
-  let scopeEnd = exeptionElements.indexOf(")");
-  let inScopeLength = scopeEnd - scopeIndex - 1;
+  let endScope = exeptionElements.indexOf(")");
+  let inScopeLength = endScope - scopeIndex - 1;
   //let scopeElements = exeptionElements.splice(scopeIndex + 1, inScopeLength);
-
+  let localScopes = closedScopesCountCheck(scopeIndex, exeptionElements);
+  if (localScopes.isconformity == true) {
+    calculateAllInnerScopes(
+      scopeIndex,
+      localScopes.openedCount,
+      exeptionElements
+    );
+  }
   // operatorsStack.push(scopeElements.filter((el) => el == "*" || el == "/"));
   // operatorsStack.push(scopeElements.filter((el) => el == "+" || el == "-"));
   // let operators = [].concat(...operatorsStack);
-  for (let i = scopeIndex + 1; i < scopeEnd; i++) {
+  for (let i = scopeIndex + 1; i < endScope; i++) {
     switch (exeptionElements[i]) {
       case "*":
         itteration++;
@@ -153,7 +162,7 @@ const scopes = (scopeIndex, exeptionElements) => {
           exeptionElements[i + 1],
           exeptionElements
         );
-        scopeEnd = exeptionElements.indexOf(")");
+        endScope = exeptionElements.indexOf(")");
         i = i - 1;
         break;
       case "/":
@@ -164,7 +173,7 @@ const scopes = (scopeIndex, exeptionElements) => {
           exeptionElements[i + 1],
           exeptionElements
         );
-        scopeEnd = exeptionElements.indexOf(")");
+        endScope = exeptionElements.indexOf(")");
         i = i - 1;
         break;
       default:
@@ -173,7 +182,7 @@ const scopes = (scopeIndex, exeptionElements) => {
   }
 
   ///// + -
-  for (let i = scopeIndex + 1; i < scopeEnd; i++) {
+  for (let i = scopeIndex + 1; i < endScope; i++) {
     switch (exeptionElements[i]) {
       case "+":
         itteration++;
@@ -183,7 +192,7 @@ const scopes = (scopeIndex, exeptionElements) => {
           exeptionElements[i + 1],
           exeptionElements
         );
-        scopeEnd = exeptionElements.indexOf(")");
+        endScope = exeptionElements.indexOf(")");
         i = i - 1;
         break;
       case "-":
@@ -194,7 +203,7 @@ const scopes = (scopeIndex, exeptionElements) => {
           exeptionElements[i + 1],
           exeptionElements
         );
-        scopeEnd = exeptionElements.indexOf(")");
+        endScope = exeptionElements.indexOf(")");
         i = i - 1;
         break;
       default:
@@ -204,7 +213,145 @@ const scopes = (scopeIndex, exeptionElements) => {
   exeptionElements.splice(scopeIndex, 1);
   exeptionElements.splice(scopeIndex + 1, 1);
 };
--810;
+////////////////////////////////////////////////Priority
+
+const localScopesCountCheck = (firstScope, ex) => {};
+
+/////////////////////////////////ScopesStack
+const scopeStack = (exeptionElements) => {
+  let scopesArray = [];
+  exeptionElements.forEach((element, index) => {
+    if (element === "(") {
+      while (exeptionElements[index] !== ")") {
+        scopesArray.push(exeptionElements[index]);
+        index++;
+      }
+      scopesArray.push(exeptionElements[index]);
+    }
+  });
+  return scopesArray;
+};
+
+////////////////////////////////closedScopesCountCheck
+const closedScopesCountCheck = (firstScope, exeptionElements) => {
+  let scopes = {
+    isconformity: false,
+    openedCount: 0,
+    closedCount: 0,
+  };
+  // ex.forEach((element, index) => {
+  for (let i = firstScope; i < exeptionElements.length; i++) {
+    if (exeptionElements[i] === "(") {
+      scopes.openedCount++;
+    } else if (exeptionElements[i] === ")") {
+      scopes.closedCount++;
+    }
+  }
+  if (
+    scopes.openedCount &&
+    scopes.closedCount !== 0 &&
+    scopes.openedCount === scopes.closedCount
+  ) {
+    console.log(`scopes count = ${scopes.openedCount}`);
+    scopes.isconformity = true;
+    return scopes;
+  } else {
+    return scopes;
+  }
+};
+
+////////////////////////////////calculateAllInnerScopes
+const calculateAllInnerScopes = (
+  firstScope,
+  openedScopesCount,
+  exeptionElements
+) => {
+  let beginScope = exeptionElements.indexOf("(", firstScope + 1);
+  let endScope = exeptionElements.indexOf(")", beginScope + 1);
+  while (openedScopesCount !== 1) {
+    for (let i = beginScope; i < endScope; i++) {
+      switch (exeptionElements[i]) {
+        case "*":
+          multiply(
+            exeptionElements[i - 1],
+            i,
+            exeptionElements[i + 1],
+            exeptionElements
+          );
+          i = i - 1;
+          if (
+            exeptionElements[i - 1] === "(" &&
+            exeptionElements[i + 1] === ")"
+          ) {
+            exeptionElements.splice(i - 1, 1);
+            exeptionElements.splice(i, 1);
+          }
+          endScope = exeptionElements.indexOf(")", beginScope);
+          break;
+        case "/":
+          devision(
+            exeptionElements[i - 1],
+            i,
+            exeptionElements[i + 1],
+            exeptionElements
+          );
+          i = i - 1;
+          if (
+            exeptionElements[i - 1] === "(" &&
+            exeptionElements[i + 1] === ")"
+          ) {
+            exeptionElements.splice(i - 1, 1);
+            exeptionElements.splice(i, 1);
+          }
+          endScope = exeptionElements.indexOf(")", beginScope);
+          break;
+      }
+    }
+    for (let i = beginScope; i < endScope; i++) {
+      switch (exeptionElements[i]) {
+        case "+":
+          addition(
+            exeptionElements[i - 1],
+            i,
+            exeptionElements[i + 1],
+            exeptionElements
+          );
+
+          i = i - 1;
+          if (
+            exeptionElements[i - 1] === "(" &&
+            exeptionElements[i + 1] === ")"
+          ) {
+            exeptionElements.splice(i - 1, 1);
+            exeptionElements.splice(i, 1);
+          }
+          endScope = exeptionElements.indexOf(")", beginScope);
+          break;
+        case "-":
+          substruct(
+            exeptionElements[i - 1],
+            i,
+            exeptionElements[i + 1],
+            exeptionElements
+          );
+          i = i - 1;
+          if (
+            exeptionElements[i - 1] === "(" &&
+            exeptionElements[i + 1] === ")"
+          ) {
+            exeptionElements.splice(i - 1, 1);
+            exeptionElements.splice(i, 1);
+          }
+          endScope = exeptionElements.indexOf(")", beginScope);
+          break;
+      }
+    }
+    openedScopesCount--;
+  }
+};
+
+///////////////////////////////////////////////////////Scopes calculations
+const scopesMultiply = () => {};
 
 /////////////////////////////////Multiply
 const multiply = (
@@ -216,6 +363,7 @@ const multiply = (
   let res = beforeElement * afterElement;
   exeptionElements[elementIndex - 1] = res;
   exeptionElements.splice(elementIndex, 2);
+
   console.log(exeptionElements);
 };
 
@@ -242,6 +390,7 @@ const substruct = (
   let res = +beforeElement - +afterElement;
   exeptionElements[elementIndex - 1] = res;
   exeptionElements.splice(elementIndex, 2);
+
   console.log(exeptionElements);
 };
 
