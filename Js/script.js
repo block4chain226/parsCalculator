@@ -4,7 +4,7 @@ let temp = 0;
 let result = 0;
 let itteration = 0;
 firstItteration = true;
-let exeption = "2*(-810)+232*44-(22+(2-18*5)*(45+3)+(94*1-34+43)*4)-44";
+let exeption = "2*(-810)*2-232*44-(22+(2/18*5)*(45+3)-(94*1-34/3)*4)*1";
 let operatorsStack = [];
 let exeptionElements;
 /////////////////////////////////String to digits
@@ -162,11 +162,46 @@ const scopes = (scopeIndex, exeptionElements) => {
   }
   ///////////////////////////////////////////////check if we have scopes!!!!!!!!!!!!!
   if (exeptionElements.indexOf("(") !== -1) {
+    endScope = exeptionElements.indexOf(")");
+    if (endScope !== -1) {
+      for (let i = scopeIndex + 1; i < endScope; i++) {
+        switch (exeptionElements[i]) {
+          case "*":
+            itteration++;
+            multiply(
+              exeptionElements[i - 1],
+              i,
+              exeptionElements[i + 1],
+              exeptionElements
+            );
+            endScope = exeptionElements.indexOf(")");
+            i = i - 1;
+            break;
+          case "/":
+            itteration++;
+            devision(
+              exeptionElements[i - 1],
+              i,
+              exeptionElements[i + 1],
+              exeptionElements
+            );
+            endScope = exeptionElements.indexOf(")");
+            i = i - 1;
+            break;
+          default:
+        }
+        //exeptionElements[elementIndex - 1] = res;
+      }
+    }
+  }
+  ///// + -
+  endScope = exeptionElements.indexOf(")");
+  if (endScope !== -1) {
     for (let i = scopeIndex + 1; i < endScope; i++) {
       switch (exeptionElements[i]) {
-        case "*":
+        case "+":
           itteration++;
-          multiply(
+          addition(
             exeptionElements[i - 1],
             i,
             exeptionElements[i + 1],
@@ -175,59 +210,27 @@ const scopes = (scopeIndex, exeptionElements) => {
           endScope = exeptionElements.indexOf(")");
           i = i - 1;
           break;
-        case "/":
+        //////////////////////////////////Main Problem!!!!!!!!!!!!!!!
+        case "-":
           itteration++;
-          devision(
+          substruct(
             exeptionElements[i - 1],
             i,
             exeptionElements[i + 1],
             exeptionElements
           );
+
           endScope = exeptionElements.indexOf(")");
           i = i - 1;
           break;
+
         default:
       }
       //exeptionElements[elementIndex - 1] = res;
     }
+    exeptionElements.splice(scopeIndex, 1);
+    exeptionElements.splice(scopeIndex + 1, 1);
   }
-  ///// + -
-  for (let i = scopeIndex + 1; i < endScope; i++) {
-    switch (exeptionElements[i]) {
-      case "+":
-        itteration++;
-        addition(
-          exeptionElements[i - 1],
-          i,
-          exeptionElements[i + 1],
-          exeptionElements
-        );
-        endScope = exeptionElements.indexOf(")");
-        i = i - 1;
-        break;
-      //////////////////////////////////Main Problem!!!!!!!!!!!!!!!
-      case "-":
-        itteration++;
-        substruct(
-          exeptionElements[i - 1],
-          i,
-          exeptionElements[i + 1],
-          exeptionElements
-        );
-        endScope = exeptionElements.indexOf(")");
-        if (endScope !== -1) {
-          i = i - 1;
-          break;
-        } else {
-          calculations(exeptionElements);
-        }
-
-      default:
-    }
-    //exeptionElements[elementIndex - 1] = res;
-  }
-  exeptionElements.splice(scopeIndex, 1);
-  exeptionElements.splice(scopeIndex + 1, 1);
 };
 ////////////////////////////////////////////////Priority
 
