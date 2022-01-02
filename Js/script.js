@@ -269,7 +269,7 @@ const calculateAllInnerScopes = (
   let beginScope = exeptionElements.indexOf("(", firstScope + 1);
   let endScope = exeptionElements.indexOf(")", beginScope + 1);
   let destroyScopes = false;
-  while (openedScopesCount !== 1) {
+  for (let j = 0; j < openedScopesCount; j++) {
     for (let i = beginScope; i < endScope; i++) {
       switch (exeptionElements[i]) {
         case "*":
@@ -335,6 +335,8 @@ const calculateAllInnerScopes = (
             exeptionElements.splice(i, 1);
             ///////////////////////////////////////////////////////////?
             beginScope = exeptionElements.indexOf("(", beginScope);
+            endScope = exeptionElements.indexOf(")", beginScope);
+            i = endScope;
             //destroyScopes = true;
           }
 
@@ -357,7 +359,7 @@ const calculateAllInnerScopes = (
             ///////////////////////////////////////////////////////////?
             beginScope = exeptionElements.indexOf("(", beginScope);
             endScope = exeptionElements.indexOf(")", beginScope);
-            break;
+            i = endScope;
 
             //destroyScopes = true;
           }
@@ -367,7 +369,7 @@ const calculateAllInnerScopes = (
       }
     }
     //}
-    openedScopesCount--;
+    //openedScopesCount--;
   }
 };
 
