@@ -4,7 +4,7 @@ let temp = 0;
 let result = 0;
 let itteration = 0;
 firstItteration = true;
-let exeption = "-810+232*44-(22+(2-18*5)*(45+3)+(94*1-34+43)*4)-44";
+let exeption = "2*(-810)+232*44-(22+(2-18*5)*(45+3)+(94*1-34+43)*4)-44";
 let operatorsStack = [];
 /////////////////////////////////String to digits
 const checkDigit = (exeptionElement) => {
@@ -37,10 +37,20 @@ const digitalSign = (exeptionElement) => {
   exeptionElement.forEach((element, index) => {
     if (
       (exeptionElement[index] === "-" && index === 0) ||
-      (exeptionElement[index] === "-" && exeptionElement[index - 1] == "(")
+      (exeptionElement[index] === "-" && exeptionElement[index - 1] == "(") ||
+      (exeptionElement[index] === "-" && exeptionElement[index - 1] === "-")
     ) {
       exeptionElement[index] += exeptionElement[index + 1];
       exeptionElement.splice(index + 1, 1);
+    }
+    if (
+      (exeptionElement[index] === "*" ||
+        exeptionElement[index] === "+" ||
+        exeptionElement[index] === "/") &&
+      exeptionElement[index + 1] === "-"
+    ) {
+      exeptionElement[index + 1] += exeptionElement[index + 2];
+      exeptionElement.splice(index + 2, 1);
     }
   });
 };
@@ -149,9 +159,8 @@ const scopes = (scopeIndex, exeptionElements) => {
       exeptionElements
     );
   }
-  // operatorsStack.push(scopeElements.filter((el) => el == "*" || el == "/"));
-  // operatorsStack.push(scopeElements.filter((el) => el == "+" || el == "-"));
-  // let operators = [].concat(...operatorsStack);
+  ///////////////////////////////////////////////check if we have scopes!!!!!!!!!!!!!
+
   for (let i = scopeIndex + 1; i < endScope; i++) {
     switch (exeptionElements[i]) {
       case "*":
@@ -267,6 +276,7 @@ const calculateAllInnerScopes = (
   exeptionElements
 ) => {
   let beginScope = exeptionElements.indexOf("(", firstScope + 1);
+  beginScope = exeptionElements.indexOf("(", beginScope + 1);
   let endScope = exeptionElements.indexOf(")", beginScope + 1);
   let destroyScopes = false;
   for (let j = 0; j < openedScopesCount; j++) {
