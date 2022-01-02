@@ -268,6 +268,7 @@ const calculateAllInnerScopes = (
 ) => {
   let beginScope = exeptionElements.indexOf("(", firstScope + 1);
   let endScope = exeptionElements.indexOf(")", beginScope + 1);
+  let destroyScopes = false;
   while (openedScopesCount !== 1) {
     for (let i = beginScope; i < endScope; i++) {
       switch (exeptionElements[i]) {
@@ -285,7 +286,10 @@ const calculateAllInnerScopes = (
           ) {
             exeptionElements.splice(i - 1, 1);
             exeptionElements.splice(i, 1);
+            ///////////////////////////////////////////////////////////?
+            beginScope = exeptionElements.indexOf("(", beginScope);
           }
+
           endScope = exeptionElements.indexOf(")", beginScope);
           break;
         case "/":
@@ -302,11 +306,16 @@ const calculateAllInnerScopes = (
           ) {
             exeptionElements.splice(i - 1, 1);
             exeptionElements.splice(i, 1);
+            ///////////////////////////////////////////////////////////?
+            beginScope = exeptionElements.indexOf("(", beginScope);
           }
+
           endScope = exeptionElements.indexOf(")", beginScope);
           break;
       }
     }
+    destroyScopes = false;
+    //while (destroyScopes === false) {
     for (let i = beginScope; i < endScope; i++) {
       switch (exeptionElements[i]) {
         case "+":
@@ -324,7 +333,11 @@ const calculateAllInnerScopes = (
           ) {
             exeptionElements.splice(i - 1, 1);
             exeptionElements.splice(i, 1);
+            ///////////////////////////////////////////////////////////?
+            beginScope = exeptionElements.indexOf("(", beginScope);
+            //destroyScopes = true;
           }
+
           endScope = exeptionElements.indexOf(")", beginScope);
           break;
         case "-":
@@ -341,11 +354,19 @@ const calculateAllInnerScopes = (
           ) {
             exeptionElements.splice(i - 1, 1);
             exeptionElements.splice(i, 1);
+            ///////////////////////////////////////////////////////////?
+            beginScope = exeptionElements.indexOf("(", beginScope);
+            endScope = exeptionElements.indexOf(")", beginScope);
+            break;
+
+            //destroyScopes = true;
           }
+
           endScope = exeptionElements.indexOf(")", beginScope);
           break;
       }
     }
+    //}
     openedScopesCount--;
   }
 };
