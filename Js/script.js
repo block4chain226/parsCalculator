@@ -6,6 +6,7 @@ let itteration = 0;
 firstItteration = true;
 let exeption = "2*(-810)+232*44-(22+(2-18*5)*(45+3)+(94*1-34+43)*4)-44";
 let operatorsStack = [];
+let exeptionElements;
 /////////////////////////////////String to digits
 const checkDigit = (exeptionElement) => {
   const specialChars = ["+", "-", "/", "*", "(", ")"];
@@ -54,10 +55,10 @@ const digitalSign = (exeptionElement) => {
     }
   });
 };
-
+exeptionElements = checkDigit(exeption.split(""));
 /////////////////////////////////Main calculations
 const calculations = (ex) => {
-  let exeptionElements = checkDigit(exeption.split(""));
+  //let exeptionElements = checkDigit(exeption.split(""));
   let tempResult;
 
   let a = "*",
@@ -160,36 +161,36 @@ const scopes = (scopeIndex, exeptionElements) => {
     );
   }
   ///////////////////////////////////////////////check if we have scopes!!!!!!!!!!!!!
-
-  for (let i = scopeIndex + 1; i < endScope; i++) {
-    switch (exeptionElements[i]) {
-      case "*":
-        itteration++;
-        multiply(
-          exeptionElements[i - 1],
-          i,
-          exeptionElements[i + 1],
-          exeptionElements
-        );
-        endScope = exeptionElements.indexOf(")");
-        i = i - 1;
-        break;
-      case "/":
-        itteration++;
-        devision(
-          exeptionElements[i - 1],
-          i,
-          exeptionElements[i + 1],
-          exeptionElements
-        );
-        endScope = exeptionElements.indexOf(")");
-        i = i - 1;
-        break;
-      default:
+  if (exeptionElements.indexOf("(") !== -1) {
+    for (let i = scopeIndex + 1; i < endScope; i++) {
+      switch (exeptionElements[i]) {
+        case "*":
+          itteration++;
+          multiply(
+            exeptionElements[i - 1],
+            i,
+            exeptionElements[i + 1],
+            exeptionElements
+          );
+          endScope = exeptionElements.indexOf(")");
+          i = i - 1;
+          break;
+        case "/":
+          itteration++;
+          devision(
+            exeptionElements[i - 1],
+            i,
+            exeptionElements[i + 1],
+            exeptionElements
+          );
+          endScope = exeptionElements.indexOf(")");
+          i = i - 1;
+          break;
+        default:
+      }
+      //exeptionElements[elementIndex - 1] = res;
     }
-    //exeptionElements[elementIndex - 1] = res;
   }
-
   ///// + -
   for (let i = scopeIndex + 1; i < endScope; i++) {
     switch (exeptionElements[i]) {
@@ -204,6 +205,7 @@ const scopes = (scopeIndex, exeptionElements) => {
         endScope = exeptionElements.indexOf(")");
         i = i - 1;
         break;
+      //////////////////////////////////Main Problem!!!!!!!!!!!!!!!
       case "-":
         itteration++;
         substruct(
@@ -213,8 +215,13 @@ const scopes = (scopeIndex, exeptionElements) => {
           exeptionElements
         );
         endScope = exeptionElements.indexOf(")");
-        i = i - 1;
-        break;
+        if (endScope !== -1) {
+          i = i - 1;
+          break;
+        } else {
+          calculations(exeptionElements);
+        }
+
       default:
     }
     //exeptionElements[elementIndex - 1] = res;
@@ -440,4 +447,4 @@ const devision = (
   console.log(exeptionElements);
 };
 
-calculations(exeption);
+calculations(exeptionElements);
